@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shibli Boys Hostel — Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --white: #ffffff;
+    --surface2: #f5f8fc;
+    --border: #dce5f0;
+    --border2: #c8d8eb;
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --blue-800: #1e40af;
+    --navy: #0f2d5e;
+    --text: #0f2d5e;
+    --text2: #4a6080;
+    --text3: #8da3bc;
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --red: #ef4444;
+    --red-light: #fee2e2;
+    --orange: #f59e0b;
+    --orange-light: #fef3c7;
+    --purple: #8b5cf6;
+    --purple-light: #ede9fe;
+    --radius: 16px;
+    --shadow-sm: 0 1px 4px rgba(15,45,94,.06),0 2px 12px rgba(15,45,94,.05);
+    --shadow: 0 4px 20px rgba(15,45,94,.1),0 1px 4px rgba(15,45,94,.06);
+    --shadow-lg: 0 12px 40px rgba(15,45,94,.15),0 2px 8px rgba(15,45,94,.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+  /* SIDEBAR */
+  .sidebar{width:256px;min-height:100vh;background:var(--navy);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 24px rgba(15,45,94,.15);}
+  .sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .logo-mark{width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,var(--blue-500),#60a5fa);display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:13px;box-shadow:0 4px 14px rgba(59,130,246,.45);}
+  .sidebar-logo h1{font-size:.95rem;font-weight:800;color:#fff;letter-spacing:-.3px;}
+  .sidebar-logo p{font-size:.68rem;color:rgba(255,255,255,.35);margin-top:2px;font-family:'DM Mono',monospace;}
+  .sidebar-nav{padding:16px 0;flex:1;overflow-y:auto;}
+  .nav-group-label{font-size:.6rem;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:1.4px;text-transform:uppercase;padding:14px 24px 6px;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:all .18s;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.5);margin:2px 10px;border-radius:12px;}
+  .nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);}
+  .nav-item.active{background:linear-gradient(135deg,var(--blue-600),var(--blue-500));color:#fff;box-shadow:0 4px 14px rgba(37,99,235,.45);}
+  .nav-item .icon{font-size:1rem;width:22px;text-align:center;flex-shrink:0;}
+  .sidebar-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,.08);font-size:.7rem;color:rgba(255,255,255,.28);}
+  .sidebar-footer strong{color:rgba(255,255,255,.45);display:block;margin-bottom:2px;}
+
+  /* MAIN */
+  .main{margin-left:256px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+  .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);}
+  .topbar-left{display:flex;align-items:center;gap:14px;}
+  .page-icon{width:38px;height:38px;border-radius:11px;background:var(--blue-50);border:1.5px solid var(--blue-100);display:flex;align-items:center;justify-content:center;font-size:1.05rem;}
+  .topbar h2{font-size:1rem;font-weight:800;color:var(--navy);}
+  .date-chip{background:var(--blue-50);border:1.5px solid var(--blue-100);border-radius:20px;padding:6px 14px;font-size:.72rem;font-weight:700;color:var(--blue-700);font-family:'DM Mono',monospace;}
+  .content{padding:28px 32px;flex:1;}
+  .page{display:none;animation:fadeUp .25s ease;}
+  .page.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* BUTTONS */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:11px;font-size:.8rem;font-weight:700;cursor:pointer;border:none;transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif;}
+  .btn-primary{background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3);}
+  .btn-primary:hover{box-shadow:0 6px 20px rgba(37,99,235,.45);transform:translateY(-1px);}
+  .btn-success{background:linear-gradient(135deg,#059669,var(--green));color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.3);}
+  .btn-success:hover{transform:translateY(-1px);}
+  .btn-ghost{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border);}
+  .btn-ghost:hover{background:var(--blue-50);border-color:var(--blue-200);color:var(--blue-700);}
+  .btn-sm{padding:6px 12px;font-size:.74rem;border-radius:8px;}
+
+  /* STAT CARDS */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px;margin-bottom:24px;}
+  .stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;transition:all .2s;position:relative;overflow:hidden;box-shadow:var(--shadow-sm);}
+  .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0;}
+  .stat-card.blue::after{background:linear-gradient(90deg,var(--blue-700),var(--blue-500));}
+  .stat-card.green::after{background:linear-gradient(90deg,#059669,var(--green));}
+  .stat-card.red::after{background:linear-gradient(90deg,#dc2626,var(--red));}
+  .stat-card.orange::after{background:linear-gradient(90deg,#d97706,var(--orange));}
+  .stat-card.purple::after{background:linear-gradient(90deg,#7c3aed,var(--purple));}
+  .stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--blue-200);}
+  .stat-card .sc-icon{font-size:1.5rem;margin-bottom:12px;}
+  .stat-card .label{font-size:.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+  .stat-card .value{font-size:2.1rem;font-weight:800;font-family:'DM Mono',monospace;color:var(--navy);}
+  .stat-card .sub{font-size:.72rem;color:var(--text3);margin-top:4px;font-weight:600;}
+
+  /* TABLE */
+  .table-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);}
+  .table-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border);background:var(--surface2);}
+  .table-header h3{font-size:.9rem;font-weight:800;color:var(--navy);}
+  .search-input{background:var(--white);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;color:var(--navy);font-size:.78rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;width:210px;outline:none;transition:all .15s;}
+  .search-input:focus{border-color:var(--blue-500);box-shadow:0 0 0 3px var(--blue-100);}
+  table{width:100%;border-collapse:collapse;}
+  thead th{background:var(--surface2);padding:11px 18px;text-align:left;font-size:.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;}
+  tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:var(--blue-50);}
+  tbody td{padding:12px 18px;font-size:.8rem;color:var(--text2);font-weight:500;}
+  tbody td:first-child{color:var(--navy);font-weight:700;}
+
+  /* BADGES */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.67rem;font-weight:700;letter-spacing:.1px;}
+  .badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+  .badge-green{background:var(--green-light);color:#065f46;}.badge-green::before{background:var(--green);}
+  .badge-red{background:var(--red-light);color:#991b1b;}.badge-red::before{background:var(--red);}
+  .badge-blue{background:var(--blue-100);color:var(--blue-800);}.badge-blue::before{background:var(--blue-500);}
+  .badge-orange{background:var(--orange-light);color:#92400e;}.badge-orange::before{background:var(--orange);}
+  .badge-purple{background:var(--purple-light);color:#5b21b6;}.badge-purple::before{background:var(--purple);}
+
+  .icon-btn{background:var(--surface2);border:1.5px solid var(--border);color:var(--text3);border-radius:8px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;transition:all .15s;}
+  .icon-btn:hover{background:var(--blue-50);color:var(--blue-600);border-color:var(--blue-200);}
+  .icon-btn.del:hover{background:var(--red-light);color:var(--red);border-color:#fca5a5;}
+  .action-btns{display:flex;gap:6px;}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(15,45,94,.3);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(6px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:20px;padding:30px;width:90%;max-width:560px;max-height:88vh;overflow-y:auto;animation:modalIn .22s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--shadow-lg);border:1.5px solid var(--border);}
+  .modal.modal-lg{max-width:760px;}
+  @keyframes modalIn{from{transform:scale(.92) translateY(20px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+  .modal-title{font-size:1.05rem;font-weight:800;margin-bottom:22px;color:var(--navy);}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group.span2{grid-column:1/-1;}
+  label{font-size:.7rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
+  .form-control{background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--navy);font-size:.82rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;outline:none;transition:all .15s;}
+  .form-control:focus{border-color:var(--blue-500);background:var(--white);box-shadow:0 0 0 3px var(--blue-100);}
+  textarea.form-control{resize:vertical;}
+  .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1.5px solid var(--border);}
+
+  /* PAGE CARD */
+  .page-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm);}
+  .section-title{font-size:1rem;font-weight:800;margin-bottom:18px;color:var(--navy);}
+  .info-banner{background:var(--blue-50);border:1.5px solid var(--blue-100);border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:.78rem;color:var(--blue-800);font-weight:600;display:flex;align-items:center;gap:10px;}
+
+  /* ROOMS */
+  .room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-top:20px;}
+  .room-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .2s;box-shadow:var(--shadow-sm);}
+  .room-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--blue-200);}
+  .room-card .room-num{font-size:1.7rem;font-weight:800;font-family:'DM Mono',monospace;color:var(--navy);}
+  .room-card .room-meta{font-size:.68rem;color:var(--text3);margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+  .beds-bar{margin:14px 0 10px;display:flex;gap:5px;flex-wrap:wrap;}
+  .bed-dot{width:22px;height:22px;border-radius:6px;display:inline-block;}
+  .bed-dot.occupied{background:linear-gradient(135deg,#dc2626,var(--red));box-shadow:0 2px 6px rgba(239,68,68,.3);}
+  .bed-dot.empty{background:var(--surface2);border:1.5px solid var(--border);}
+  .room-stats{font-size:.72rem;color:var(--text3);font-weight:700;}
+  .room-actions{display:flex;gap:8px;margin-top:14px;align-items:center;}
+
+  /* MENU */
+  .menu-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
+  .menu-day-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);}
+  .menu-day-header{background:linear-gradient(135deg,var(--navy),var(--blue-700));padding:11px;font-size:.72rem;font-weight:800;text-align:center;color:#fff;text-transform:uppercase;letter-spacing:.8px;}
+  .menu-meals{padding:12px;display:flex;flex-direction:column;gap:6px;}
+  .meal-item{font-size:.7rem;}
+  .meal-label{font-size:.6rem;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);font-weight:700;margin-bottom:2px;}
+  .meal-text{color:var(--text2);font-weight:600;line-height:1.35;}
+  .meal-edit-btn{background:none;border:none;color:var(--blue-600);font-size:.65rem;cursor:pointer;margin-top:3px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;}
+  .meal-edit-btn:hover{color:var(--blue-800);}
+  .meal-divider{border:none;border-top:1px solid var(--border);margin:6px 0;}
+
+  /* FEE */
+  .fee-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px;}
+  .fee-box{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;box-shadow:var(--shadow-sm);transition:all .2s;}
+  .fee-box:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .fee-box .fb-val{font-size:1.9rem;font-weight:800;font-family:'DM Mono',monospace;}
+  .fee-box .fb-lbl{font-size:.68rem;color:var(--text3);margin-top:5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+
+  /* TABS */
+  .tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:4px;width:fit-content;box-shadow:var(--shadow-sm);}
+  .tab-btn{padding:8px 22px;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer;border:none;background:none;color:var(--text3);font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;}
+  .tab-btn.active{background:linear-gradient(135deg,var(--blue-700),var(--blue-600));color:#fff;box-shadow:0 3px 10px rgba(37,99,235,.3);}
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+
+  /* EMPTY */
+  .empty-state{text-align:center;padding:52px 20px;color:var(--text3);}
+  .empty-state .icon{font-size:2.8rem;margin-bottom:12px;}
+  .empty-state p{font-size:.85rem;font-weight:600;}
+
+  /* NOTIFICATION */
+  .notification{position:fixed;top:20px;right:20px;z-index:2000;background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:14px 20px;font-size:.82rem;font-weight:700;box-shadow:var(--shadow-lg);animation:notifIn .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:10px;max-width:320px;color:var(--navy);}
+  @keyframes notifIn{from{transform:translateX(130%) scale(.85);}to{transform:translateX(0) scale(1);}}
+  .notif-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .notif-success .notif-dot{background:var(--green);}
+  .notif-error .notif-dot{background:var(--red);}
+
+  ::-webkit-scrollbar{width:5px;}
+  ::-webkit-scrollbar-track{background:var(--bg);border-radius:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px;}
+
+  /* MOBILE */
+  .hamburger{display:none;background:none;border:none;color:var(--navy);font-size:1.3rem;cursor:pointer;}
+  @media(max-width:768px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;}
+    .hamburger{display:block;}
+    .form-grid{grid-template-columns:1fr;}
+    .menu-grid{grid-template-columns:repeat(2,1fr);}
+    .content{padding:20px 16px;}
+    .topbar{padding:0 16px;}
+  }
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,45,94,.4);z-index:99;}
+  .sidebar-overlay.open{display:block;}
+</style>
+</head>
+<body>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🏨</div>
+    <h1>Shibli Boys Hostel</h1>
+    <p>Management System v2.0</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">📊</span>Dashboard</div>
+    <div class="nav-group-label">Admissions</div>
+    <div class="nav-item" onclick="showPage('admission',this)"><span class="icon">📝</span>Admission Form</div>
+    <div class="nav-group-label">Management</div>
+    <div class="nav-item" onclick="showPage('students',this)"><span class="icon">👥</span>Students</div>
+    <div class="nav-item" onclick="showPage('rooms',this)"><span class="icon">🛏️</span>Rooms</div>
+    <div class="nav-item" onclick="showPage('staff',this)"><span class="icon">👤</span>Staff</div>
+    <div class="nav-group-label">Finance & Food</div>
+    <div class="nav-item" onclick="showPage('fees',this)"><span class="icon">💰</span>Fee Management</div>
+    <div class="nav-item" onclick="showPage('menu',this)"><span class="icon">🍽️</span>Weekly Menu</div>
+  </nav>
+  <div class="sidebar-footer"><strong>Shibli Boys Hostel</strong>&copy; 2025 All rights reserved</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="page-icon" id="pageIcon">📊</div>
+      <h2 id="pageTitle">Dashboard</h2>
+    </div>
+    <div class="date-chip" id="topDate"></div>
+  </div>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="table-card">
+        <div class="table-header"><h3>Recent Admissions</h3><button class="btn btn-primary btn-sm" onclick="showPage('students',null)">View All →</button></div>
+        <div id="recentStudents"></div>
+      </div>
+    </div>
+
+    <!-- ADMISSION -->
+    <div class="page" id="page-admission">
+      <div class="page-card">
+        <h3 class="section-title">🎓 New Admission Application</h3>
+        <div class="info-banner">ℹ️ Eligibility: Matric Pass required · Entry test compulsory (min 40/100) · Merit-based selection</div>
+        <form onsubmit="submitAdmission(event)">
+          <div class="form-grid">
+            <div class="form-group"><label>Full Name *</label><input class="form-control" id="aFullName" placeholder="Enter full name" required></div>
+            <div class="form-group"><label>Father's Name *</label><input class="form-control" id="aFatherName" placeholder="Father's name" required></div>
+            <div class="form-group"><label>CNIC / B-Form *</label><input class="form-control" id="aCnic" placeholder="XXXXX-XXXXXXX-X" required></div>
+            <div class="form-group"><label>Date of Birth *</label><input class="form-control" type="date" id="aDob" required></div>
+            <div class="form-group"><label>Contact Number *</label><input class="form-control" id="aContact" placeholder="03XX-XXXXXXX" required></div>
+            <div class="form-group"><label>Matric Pass? *</label>
+              <select class="form-control" id="aMatric" required onchange="toggleMatricFields()">
+                <option value="">-- Select --</option><option value="yes">Yes</option><option value="no">No</option>
+              </select>
+            </div>
+            <div class="form-group" id="matricMarksGroup" style="display:none"><label>Matric Marks (out of 1100)</label><input class="form-control" type="number" id="aMarks" min="0" max="1100" placeholder="e.g. 875"></div>
+            <div class="form-group" id="testMarksGroup" style="display:none"><label>Entry Test Marks (out of 100)</label><input class="form-control" type="number" id="aTestMarks" min="0" max="100" placeholder="e.g. 72"></div>
+            <div class="form-group"><label>Room Preference</label>
+              <select class="form-control" id="aRoomPref">
+                <option value="any">Any Available</option><option value="single">Single Room</option><option value="double">Double Room</option><option value="triple">Triple Room</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Guardian Name</label><input class="form-control" id="aGuardian" placeholder="Guardian name"></div>
+            <div class="form-group"><label>Guardian Contact</label><input class="form-control" id="aGuardianContact" placeholder="Guardian number"></div>
+            <div class="form-group span2"><label>Address *</label><textarea class="form-control" id="aAddress" rows="2" placeholder="Full residential address" required></textarea></div>
+          </div>
+          <div id="eligibilityMsg" style="margin-top:14px;font-size:.78rem;color:var(--red);font-weight:700;background:var(--red-light);padding:12px 16px;border-radius:10px;display:none;border:1.5px solid #fca5a5;"></div>
+          <div style="margin-top:22px;display:flex;gap:10px;">
+            <button class="btn btn-primary" type="submit">✅ Submit Application</button>
+            <button class="btn btn-ghost" type="reset" onclick="resetAdmissionForm()">🔄 Reset</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="page" id="page-students">
+      <div class="table-card">
+        <div class="table-header"><h3>All Students</h3>
+          <div style="display:flex;gap:8px;">
+            <input class="search-input" placeholder="🔍 Search student..." oninput="searchStudents(this.value)">
+            <button class="btn btn-primary btn-sm" onclick="showPage('admission',null)">+ New</button>
+          </div>
+        </div>
+        <div id="studentsTable"></div>
+      </div>
+    </div>
+
+    <!-- ROOMS -->
+    <div class="page" id="page-rooms">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 class="section-title" style="margin:0">Room Management</h3>
+        <button class="btn btn-primary" onclick="openRoomModal()">+ Add Room</button>
+      </div>
+      <div class="stat-grid" id="roomStats"></div>
+      <div class="room-grid" id="roomGrid"></div>
+    </div>
+
+    <!-- STAFF -->
+    <div class="page" id="page-staff">
+      <div class="tabs" id="staffTabs">
+        <button class="tab-btn active" onclick="switchStaffTab('wardens')">Wardens</button>
+        <button class="tab-btn" onclick="switchStaffTab('heads')">Heads</button>
+      </div>
+      <div class="tab-content active" id="staffTab-wardens">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 class="section-title" style="margin:0">Wardens</h3>
+          <button class="btn btn-primary" onclick="openStaffModal('warden')">+ Add Warden</button>
+        </div>
+        <div class="table-card" id="wardensTable"></div>
+      </div>
+      <div class="tab-content" id="staffTab-heads">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 class="section-title" style="margin:0">Heads</h3>
+          <button class="btn btn-primary" onclick="openStaffModal('head')">+ Add Head</button>
+        </div>
+        <div class="table-card" id="headsTable"></div>
+      </div>
+    </div>
+
+    <!-- FEES -->
+    <div class="page" id="page-fees">
+      <div class="fee-summary" id="feeSummary"></div>
+      <div class="table-card">
+        <div class="table-header"><h3>Fee Records</h3>
+          <input class="search-input" placeholder="🔍 Search..." oninput="searchFees(this.value)">
+        </div>
+        <div id="feeTable"></div>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div class="page" id="page-menu">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
+        <h3 class="section-title" style="margin:0">📅 Weekly Menu</h3>
+        <button class="btn btn-ghost" onclick="resetMenu()">🔄 Reset to Default</button>
+      </div>
+      <div class="menu-grid" id="menuGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="roomModal">
+  <div class="modal">
+    <h3 class="modal-title" id="roomModalTitle">Add New Room</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Room Number</label><input class="form-control" id="rNum" placeholder="e.g. 101"></div>
+      <div class="form-group"><label>Room Type</label>
+        <select class="form-control" id="rType"><option value="single">Single (1 bed)</option><option value="double">Double (2 beds)</option><option value="triple">Triple (3 beds)</option><option value="quad">Quad (4 beds)</option></select>
+      </div>
+      <div class="form-group"><label>Floor</label><input class="form-control" id="rFloor" placeholder="e.g. Ground"></div>
+      <div class="form-group"><label>Status</label>
+        <select class="form-control" id="rStatus"><option value="available">Available</option><option value="maintenance">Maintenance</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('roomModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRoom()">Save Room</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="assignModal">
+  <div class="modal">
+    <h3 class="modal-title">Assign Student to Room <span id="assignRoomNum" style="color:var(--blue-600)"></span></h3>
+    <div class="form-group"><label>Select Student</label><select class="form-control" id="assignStudent"></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('assignModal')">Cancel</button>
+      <button class="btn btn-success" onclick="assignStudentToRoom()">Assign</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="staffModal">
+  <div class="modal">
+    <h3 class="modal-title" id="staffModalTitle">Add Staff</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Full Name</label><input class="form-control" id="sName" placeholder="Full name"></div>
+      <div class="form-group"><label>Role</label>
+        <select class="form-control" id="sRole"><option value="Warden">Warden</option><option value="Male Head">Male Head</option><option value="Female Head">Female Head</option></select>
+      </div>
+      <div class="form-group"><label>Contact</label><input class="form-control" id="sContact" placeholder="Phone number"></div>
+      <div class="form-group"><label>Email</label><input class="form-control" id="sEmail" placeholder="Email address"></div>
+      <div class="form-group span2"><label>Joining Date</label><input class="form-control" type="date" id="sJoining"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('staffModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStaff()">Save Staff</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="editStudentModal">
+  <div class="modal modal-lg">
+    <h3 class="modal-title">✏️ Edit Student</h3>
+    <div class="form-grid">
+      <div class="form-group"><label>Full Name</label><input class="form-control" id="esFullName"></div>
+      <div class="form-group"><label>Father's Name</label><input class="form-control" id="esFatherName"></div>
+      <div class="form-group"><label>Contact</label><input class="form-control" id="esContact"></div>
+      <div class="form-group"><label>Assigned Room</label><select class="form-control" id="esRoom"></select></div>
+    </div>
+    <input type="hidden" id="esIndex">
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editStudentModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditStudent()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="menuModal">
+  <div class="modal">
+    <h3 class="modal-title" id="menuModalTitle">Edit Meal</h3>
+    <input type="hidden" id="menuDay"><input type="hidden" id="menuMealType">
+    <div class="form-group"><label>Meal Description</label><input class="form-control" id="menuMealText" placeholder="Enter meal for this slot"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('menuModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMenuMeal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CAPACITY_MAP={single:1,double:2,triple:3,quad:4};
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const PAGE_ICONS={dashboard:'📊',admission:'📝',students:'👥',rooms:'🛏️',staff:'👤',fees:'💰',menu:'🍽️'};
+
+function loadData(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function saveData(k,v){localStorage.setItem(k,JSON.stringify(v));}
+
+let students=loadData('hms_students',[]);
+let rooms=loadData('hms_rooms',[
+  {id:'r1',num:'101',type:'single',floor:'Ground',status:'available',occupants:[]},
+  {id:'r2',num:'102',type:'double',floor:'Ground',status:'available',occupants:[]},
+  {id:'r3',num:'201',type:'triple',floor:'First',status:'available',occupants:[]},
+  {id:'r4',num:'202',type:'quad',floor:'First',status:'available',occupants:[]},
+]);
+let staff=loadData('hms_staff',[
+  {id:'s1',name:'Mr. Meraj',role:'Warden',contact:'0300-1234567',email:'Meraj@hostel.pk',joining:'2022-01-15'},
+  {id:'s2',name:'Mr. Meraj',role:'Male Head',contact:'0311-9876543',email:'meraj@hostel.pk',joining:'2021-06-01'},
+  //{id:'s3',name:'Ms. Sana Fatima',role:'Female Head',contact:'0321-5554444',email:'sana@hostel.pk',joining:'2023-03-10'},
+]);
+let fees=loadData('hms_fees',[]);
+let menu=loadData('hms_menu',{
+  Monday:{breakfast:'Paratha & Chai',lunch:'Daal Chawal',dinner:'Biryani'},
+  Tuesday:{breakfast:'Egg & Toast',lunch:'Sabzi Roti',dinner:'Qeema Naan'},
+  Wednesday:{breakfast:'Halwa Puri',lunch:'Chicken Karahi',dinner:'Nihari'},
+  Thursday:{breakfast:'Paratha & Lassi',lunch:'Daal Mash',dinner:'Palak Gosht'},
+  Friday:{breakfast:'Nashta Platter',lunch:'Daal Chana',dinner:'Mutton Korma'},
+  Saturday:{breakfast:'Omelette Roll',lunch:'Mix Veg',dinner:'BBQ Night'},
+  Sunday:{breakfast:'Paye & Naan',lunch:'Chicken Pulao',dinner:'Dum Biryani'},
+});
+let editRoomId=null,assignRoomId=null;
+
+function uid(){return 'id_'+Math.random().toString(36).slice(2,9);}
+function showPage(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'"))n.classList.add('active');});
+  const titles={dashboard:'Dashboard',admission:'Admission Form',students:'Students',rooms:'Rooms',staff:'Staff',fees:'Fee Management',menu:'Weekly Menu'};
+  document.getElementById('pageTitle').textContent=titles[page]||page;
+  document.getElementById('pageIcon').textContent=PAGE_ICONS[page]||'📄';
+  renderPage(page);
+  if(window.innerWidth<768)toggleSidebar(false);
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function notify(msg,type='success'){
+  const n=document.createElement('div');
+  n.className=`notification notif-${type}`;
+  n.innerHTML=`<span class="notif-dot"></span>${msg}`;
+  document.body.appendChild(n);
+  setTimeout(()=>{n.style.transition='opacity .3s';n.style.opacity='0';},2600);
+  setTimeout(()=>n.remove(),3000);
+}
+function toggleSidebar(force){
+  const s=document.getElementById('sidebar'),o=document.getElementById('sidebarOverlay');
+  const open=force!==undefined?force:!s.classList.contains('open');
+  s.classList.toggle('open',open);o.classList.toggle('open',open);
+}
+function renderPage(p){
+  ({dashboard:renderDashboard,students:renderStudents,rooms:renderRooms,staff:renderStaff,fees:renderFees,menu:renderMenu})[p]?.();
+}
+
+// DASHBOARD
+function renderDashboard(){
+  const tr=rooms.length,or=rooms.filter(r=>r.occupants&&r.occupants.length>0).length;
+  const tb=rooms.reduce((s,r)=>s+CAPACITY_MAP[r.type],0),ob=rooms.reduce((s,r)=>s+(r.occupants?r.occupants.length:0),0);
+  document.getElementById('statGrid').innerHTML=`
+    <div class="stat-card blue"><div class="sc-icon">👥</div><div class="label">Total Students</div><div class="value">${students.length}</div><div class="sub">enrolled</div></div>
+    <div class="stat-card purple"><div class="sc-icon">🛏️</div><div class="label">Total Rooms</div><div class="value">${tr}</div><div class="sub">${rooms.filter(r=>r.status==='available').length} available</div></div>
+    <div class="stat-card orange"><div class="sc-icon">🔒</div><div class="label">Occupied Rooms</div><div class="value">${or}</div><div class="sub">${tr-or} empty</div></div>
+    <div class="stat-card green"><div class="sc-icon">✅</div><div class="label">Occupied Beds</div><div class="value">${ob}</div><div class="sub">${tb-ob} free beds</div></div>
+    <div class="stat-card purple"><div class="sc-icon">👤</div><div class="label">Staff</div><div class="value">${staff.length}</div><div class="sub">on duty</div></div>
+    <div class="stat-card red"><div class="sc-icon">💰</div><div class="label">Fee Pending</div><div class="value">${fees.filter(f=>f.status==='unpaid').length}</div><div class="sub">students</div></div>
+  `;
+  const recent=students.slice(-5).reverse();
+  document.getElementById('recentStudents').innerHTML=recent.length===0
+    ?'<div class="empty-state"><div class="icon">📋</div><p>No students yet.</p></div>'
+    :`<table><thead><tr><th>Name</th><th>Room</th><th>Merit</th><th>Status</th></tr></thead><tbody>${recent.map(s=>`<tr><td>${s.fullName}</td><td>${s.assignedRoom||'—'}</td><td>${s.merit||'—'}</td><td><span class="badge badge-green">Active</span></td></tr>`).join('')}</tbody></table>`;
+}
+
+// ADMISSION
+function toggleMatricFields(){const v=document.getElementById('aMatric').value;['matricMarksGroup','testMarksGroup'].forEach(id=>document.getElementById(id).style.display=v==='yes'?'flex':'none');}
+function resetAdmissionForm(){['matricMarksGroup','testMarksGroup'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('eligibilityMsg').style.display='none';}
+function submitAdmission(e){
+  e.preventDefault();
+  const matric=document.getElementById('aMatric').value,msg=document.getElementById('eligibilityMsg');
+  if(matric!=='yes'){msg.style.display='block';msg.textContent='❌ Only Matric Pass students are eligible to apply.';return;}
+  const testMarks=parseInt(document.getElementById('aTestMarks').value)||0;
+  if(testMarks<40){msg.style.display='block';msg.textContent='❌ Minimum 40/100 required in entry test.';return;}
+  msg.style.display='none';
+  const marks=parseInt(document.getElementById('aMarks').value)||0;
+  const merit=(marks/1100*60+testMarks*0.4).toFixed(1);
+  const student={id:uid(),fullName:document.getElementById('aFullName').value,fatherName:document.getElementById('aFatherName').value,cnic:document.getElementById('aCnic').value,dob:document.getElementById('aDob').value,contact:document.getElementById('aContact').value,address:document.getElementById('aAddress').value,matric,marks,testMarks,roomPref:document.getElementById('aRoomPref').value,guardian:document.getElementById('aGuardian').value,guardianContact:document.getElementById('aGuardianContact').value,merit,assignedRoom:null,admissionDate:new Date().toISOString().split('T')[0]};
+  students.push(student);saveData('hms_students',students);
+  fees.push({id:uid(),studentId:student.id,studentName:student.fullName,amount:15000,status:'unpaid',month:new Date().toLocaleString('en',{month:'long'}),year:new Date().getFullYear()});
+  saveData('hms_fees',fees);
+  notify(`✅ Admission submitted! Merit: ${merit}`);
+  e.target.reset();resetAdmissionForm();
+}
+
+// STUDENTS
+function renderStudents(filter=''){
+  const list=filter?students.filter(s=>s.fullName.toLowerCase().includes(filter)||s.cnic.includes(filter)):students;
+  document.getElementById('studentsTable').innerHTML=list.length===0
+    ?'<div class="empty-state"><div class="icon">👥</div><p>No students found.</p></div>'
+    :`<table><thead><tr><th>Name</th><th>Father</th><th>CNIC</th><th>Contact</th><th>Merit</th><th>Room</th><th>Fee</th><th>Actions</th></tr></thead><tbody>${list.map(s=>{
+      const fr=fees.find(f=>f.studentId===s.id),fs=fr?fr.status:'N/A',idx=students.indexOf(s);
+      return `<tr><td>${s.fullName}</td><td>${s.fatherName}</td><td style="font-family:'DM Mono',monospace;font-size:.72rem">${s.cnic}</td><td>${s.contact}</td><td><span class="badge badge-blue">${s.merit}</span></td><td>${s.assignedRoom?`<span class="badge badge-green">${s.assignedRoom}</span>`:'<span class="badge badge-orange">Unassigned</span>'}</td><td><span class="badge ${fs==='paid'?'badge-green':'badge-red'}">${fs}</span></td><td class="action-btns"><button class="icon-btn" onclick="openEditStudent(${idx})">✏️</button><button class="icon-btn del" onclick="deleteStudent(${idx})">🗑️</button></td></tr>`;
+    }).join('')}</tbody></table>`;
+}
+function searchStudents(v){renderStudents(v.toLowerCase());}
+function deleteStudent(i){
+  if(!confirm('Delete this student?'))return;
+  const s=students[i];
+  rooms.forEach(r=>{if(r.occupants)r.occupants=r.occupants.filter(o=>o!==s.id);});
+  saveData('hms_rooms',rooms);fees=fees.filter(f=>f.studentId!==s.id);saveData('hms_fees',fees);
+  students.splice(i,1);saveData('hms_students',students);notify('Student removed.','error');renderStudents();
+}
+function openEditStudent(i){
+  const s=students[i];
+  document.getElementById('esFullName').value=s.fullName;document.getElementById('esFatherName').value=s.fatherName;document.getElementById('esContact').value=s.contact;document.getElementById('esIndex').value=i;
+  document.getElementById('esRoom').innerHTML='<option value="">Unassigned</option>'+rooms.map(r=>`<option value="${r.num}" ${s.assignedRoom===r.num?'selected':''}>${r.num} (${r.type})</option>`).join('');
+  openModal('editStudentModal');
+}
+function saveEditStudent(){
+  const i=parseInt(document.getElementById('esIndex').value);
+  students[i].fullName=document.getElementById('esFullName').value;students[i].fatherName=document.getElementById('esFatherName').value;students[i].contact=document.getElementById('esContact').value;students[i].assignedRoom=document.getElementById('esRoom').value||null;
+  saveData('hms_students',students);notify('Student updated!');closeModal('editStudentModal');renderStudents();
+}
+
+// ROOMS
+function renderRooms(){
+  const tr=rooms.length,or=rooms.filter(r=>r.occupants&&r.occupants.length>0).length;
+  const tb=rooms.reduce((s,r)=>s+CAPACITY_MAP[r.type],0),ob=rooms.reduce((s,r)=>s+(r.occupants?r.occupants.length:0),0);
+  document.getElementById('roomStats').innerHTML=`
+    <div class="stat-card blue"><div class="label">Total Rooms</div><div class="value">${tr}</div></div>
+    <div class="stat-card orange"><div class="label">Occupied</div><div class="value">${or}</div></div>
+    <div class="stat-card green"><div class="label">Empty</div><div class="value">${tr-or}</div></div>
+    <div class="stat-card purple"><div class="label">Total Beds</div><div class="value">${tb}</div><div class="sub">${ob} occupied · ${tb-ob} free</div></div>
+  `;
+  document.getElementById('roomGrid').innerHTML=rooms.length===0
+    ?'<div class="empty-state"><div class="icon">🛏️</div><p>No rooms added yet.</p></div>'
+    :rooms.map(r=>{
+      const cap=CAPACITY_MAP[r.type],occ=r.occupants?r.occupants.length:0;
+      return `<div class="room-card"><div class="room-num">${r.num}</div><div class="room-meta">${r.type} · ${r.floor} Floor</div>
+        <div class="beds-bar">${Array.from({length:cap},(_,i)=>`<span class="bed-dot ${i<occ?'occupied':'empty'}"></span>`).join('')}</div>
+        <div class="room-stats">${occ}/${cap} beds occupied</div>
+        <div class="room-actions">${occ<cap?`<button class="btn btn-success btn-sm" onclick="openAssignModal('${r.id}')">+ Assign</button>`:'<span class="badge badge-red">Full</span>'}
+        <button class="icon-btn del" onclick="deleteRoom('${r.id}')">🗑️</button></div></div>`;
+    }).join('');
+}
+function openRoomModal(){editRoomId=null;document.getElementById('rNum').value='';document.getElementById('rFloor').value='';document.getElementById('roomModalTitle').textContent='Add New Room';openModal('roomModal');}
+function saveRoom(){
+  const num=document.getElementById('rNum').value.trim();
+  if(!num){notify('Room number required','error');return;}
+  if(rooms.find(r=>r.num===num&&r.id!==editRoomId)){notify('Room number exists','error');return;}
+  if(editRoomId){const r=rooms.find(r=>r.id===editRoomId);r.num=num;r.type=document.getElementById('rType').value;r.floor=document.getElementById('rFloor').value;r.status=document.getElementById('rStatus').value;}
+  else rooms.push({id:uid(),num,type:document.getElementById('rType').value,floor:document.getElementById('rFloor').value,status:document.getElementById('rStatus').value,occupants:[]});
+  saveData('hms_rooms',rooms);notify('Room saved!');closeModal('roomModal');renderRooms();
+}
+function deleteRoom(id){if(!confirm('Delete this room?'))return;rooms=rooms.filter(r=>r.id!==id);saveData('hms_rooms',rooms);notify('Room deleted.','error');renderRooms();}
+function openAssignModal(roomId){
+  assignRoomId=roomId;const r=rooms.find(r=>r.id===roomId);document.getElementById('assignRoomNum').textContent=r.num;
+  const u=students.filter(s=>!s.assignedRoom);if(!u.length){notify('No unassigned students','error');return;}
+  document.getElementById('assignStudent').innerHTML=u.map(s=>`<option value="${s.id}">${s.fullName}</option>`).join('');openModal('assignModal');
+}
+function assignStudentToRoom(){
+  const sid=document.getElementById('assignStudent').value,r=rooms.find(r=>r.id===assignRoomId),s=students.find(s=>s.id===sid);
+  if(!r||!s)return;r.occupants=r.occupants||[];r.occupants.push(sid);s.assignedRoom=r.num;
+  saveData('hms_rooms',rooms);saveData('hms_students',students);notify(`${s.fullName} assigned to Room ${r.num}`);closeModal('assignModal');renderRooms();
+}
+
+// STAFF
+function renderStaff(){
+  const makeTable=list=>list.length===0?'<div class="empty-state"><div class="icon">👤</div><p>No staff added.</p></div>'
+    :`<table><thead><tr><th>Name</th><th>Role</th><th>Contact</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead><tbody>${list.map(s=>`<tr><td>${s.name}</td><td><span class="badge ${s.role==='Warden'?'badge-blue':s.role==='Male Head'?'badge-purple':'badge-orange'}">${s.role}</span></td><td>${s.contact}</td><td>${s.email}</td><td>${s.joining}</td><td><button class="icon-btn del" onclick="deleteStaff('${s.id}')">🗑️</button></td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('wardensTable').innerHTML=makeTable(staff.filter(s=>s.role==='Warden'));
+  document.getElementById('headsTable').innerHTML=makeTable(staff.filter(s=>s.role!=='Warden'));
+}
+function switchStaffTab(tab){
+  document.querySelectorAll('[id^="staffTab-"]').forEach(t=>t.classList.remove('active'));document.getElementById('staffTab-'+tab).classList.add('active');
+  document.querySelectorAll('#staffTabs .tab-btn').forEach((b,i)=>b.classList.toggle('active',i===(tab==='wardens'?0:1)));
+}
+function openStaffModal(type){document.getElementById('staffModalTitle').textContent=type==='warden'?'Add Warden':'Add Head';document.getElementById('sRole').value=type==='warden'?'Warden':'Male Head';['sName','sContact','sEmail'].forEach(id=>document.getElementById(id).value='');document.getElementById('sJoining').value=new Date().toISOString().split('T')[0];openModal('staffModal');}
+function saveStaff(){
+  const name=document.getElementById('sName').value.trim();if(!name){notify('Name required','error');return;}
+  staff.push({id:uid(),name,role:document.getElementById('sRole').value,contact:document.getElementById('sContact').value,email:document.getElementById('sEmail').value,joining:document.getElementById('sJoining').value});
+  saveData('hms_staff',staff);notify('Staff added!');closeModal('staffModal');renderStaff();
+}
+function deleteStaff(id){if(!confirm('Delete staff?'))return;staff=staff.filter(s=>s.id!==id);saveData('hms_staff',staff);notify('Staff removed.','error');renderStaff();}
+
+// FEES
+function renderFees(filter=''){
+  const total=fees.length,paid=fees.filter(f=>f.status==='paid').length,paidAmt=fees.filter(f=>f.status==='paid').reduce((s,f)=>s+f.amount,0);
+  document.getElementById('feeSummary').innerHTML=`
+    <div class="fee-box"><div class="fb-val" style="color:var(--blue-600)">${total}</div><div class="fb-lbl">Total Records</div></div>
+    <div class="fee-box"><div class="fb-val" style="color:var(--green)">${paid}</div><div class="fb-lbl">Paid</div></div>
+    <div class="fee-box"><div class="fb-val" style="color:var(--red)">${total-paid}</div><div class="fb-lbl">Unpaid</div></div>
+    <div class="fee-box"><div class="fb-val" style="color:var(--orange)">Rs ${(paidAmt/1000).toFixed(0)}K</div><div class="fb-lbl">Collected</div></div>
+  `;
+  const list=filter?fees.filter(f=>f.studentName.toLowerCase().includes(filter)):fees;
+  document.getElementById('feeTable').innerHTML=list.length===0?'<div class="empty-state"><div class="icon">💰</div><p>No fee records yet.</p></div>'
+    :`<table><thead><tr><th>Student</th><th>Month</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(f=>`<tr><td>${f.studentName}</td><td>${f.month} ${f.year}</td><td style="font-family:'DM Mono',monospace;font-weight:700">Rs ${f.amount.toLocaleString()}</td><td><span class="badge ${f.status==='paid'?'badge-green':'badge-red'}">${f.status}</span></td><td>${f.status==='unpaid'?`<button class="btn btn-success btn-sm" onclick="markFeePaid('${f.id}')">✓ Mark Paid</button>`:`<button class="btn btn-ghost btn-sm" onclick="markFeeUnpaid('${f.id}')">↩ Unpaid</button>`}</td></tr>`).join('')}</tbody></table>`;
+}
+function markFeePaid(id){const f=fees.find(f=>f.id===id);if(f){f.status='paid';saveData('hms_fees',fees);notify('Fee marked as paid! ✅');renderFees();}}
+function markFeeUnpaid(id){const f=fees.find(f=>f.id===id);if(f){f.status='unpaid';saveData('hms_fees',fees);notify('Marked as unpaid.','error');renderFees();}}
+function searchFees(v){renderFees(v.toLowerCase());}
+
+// MENU
+function renderMenu(){
+  document.getElementById('menuGrid').innerHTML=DAYS.map(day=>`
+    <div class="menu-day-card"><div class="menu-day-header">${day.slice(0,3)}</div>
+    <div class="menu-meals">${['breakfast','lunch','dinner'].map((meal,i)=>`${i>0?'<hr class="meal-divider">':''}<div class="meal-item"><div class="meal-label">${meal}</div><div class="meal-text">${menu[day][meal]}</div><button class="meal-edit-btn" onclick="openMenuModal('${day}','${meal}')">✏️ Edit</button></div>`).join('')}</div></div>`).join('');
+}
+function openMenuModal(day,mealType){
+  document.getElementById('menuModalTitle').textContent=`Edit ${mealType.charAt(0).toUpperCase()+mealType.slice(1)} — ${day}`;
+  document.getElementById('menuDay').value=day;document.getElementById('menuMealType').value=mealType;document.getElementById('menuMealText').value=menu[day][mealType];openModal('menuModal');
+}
+function saveMenuMeal(){
+  menu[document.getElementById('menuDay').value][document.getElementById('menuMealType').value]=document.getElementById('menuMealText').value;
+  saveData('hms_menu',menu);notify('Menu updated! 🍽️');closeModal('menuModal');renderMenu();
+}
+function resetMenu(){if(!confirm('Reset menu to defaults?'))return;localStorage.removeItem('hms_menu');location.reload();}
+
+// INIT
+document.getElementById('topDate').textContent=new Date().toLocaleDateString('en-PK',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+renderDashboard();
+</script>
+</body>
+</html>
